@@ -179,7 +179,43 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
         </div>
       </div>
 
+      {/* Animation Controls */}
+      <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center space-x-3">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              ✨ Animated Connectors:
+            </span>
+            <button
+              onClick={() => setAnimationsEnabled(!animationsEnabled)}
+              className={`px-4 py-1.5 rounded-lg font-medium text-sm transition-colors ${
+                animationsEnabled
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500'
+              }`}
+            >
+              {animationsEnabled ? 'ON' : 'OFF'}
+            </button>
+          </div>
+          {animationsEnabled && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Type:</span>
+              <select
+                value={animationType}
+                onChange={(e) => setAnimationType(e.target.value as 'flow' | 'pulse' | 'glow')}
+                className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <option value="flow">Flow</option>
+                <option value="pulse">Pulse</option>
+                <option value="glow">Glow</option>
+              </select>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div
+        ref={svgContainerRef}
         className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-700"
         style={{ height: '600px', cursor: isDragging ? 'grabbing' : 'grab' }}
         onMouseDown={handleMouseDown}
@@ -188,22 +224,20 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       >
-        {imageUrl ? (
+        {svgContent ? (
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{
               transform: `translate(${position.x}px, ${position.y}px)`,
             }}
           >
-            <img
-              src={imageUrl}
-              alt="PlantUML Diagram"
+            <div
               className="max-w-none select-none"
               style={{
                 transform: `scale(${zoom / 100})`,
                 transformOrigin: 'center',
               }}
-              draggable={false}
+              dangerouslySetInnerHTML={{ __html: svgContent }}
             />
           </div>
         ) : (
@@ -217,9 +251,54 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
 
       <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          💡 <strong>Tips:</strong> Drag to pan, scroll to zoom, or use the controls above
+          💡 <strong>Tips:</strong> Drag to pan, scroll to zoom, or use the controls above. Toggle animated connectors for dynamic visualization!
         </p>
       </div>
+
+      <style jsx>{`
+        :global(.connector-flow) {
+          stroke-dasharray: 10 5;
+          animation: dash-flow 2s linear infinite;
+        }
+
+        :global(.connector-pulse) {
+          animation: pulse-animation 1.5s ease-in-out infinite;
+        }
+
+        :global(.connector-glow) {
+          filter: drop-shadow(0 0 3px currentColor);
+          animation: glow-animation 2s ease-in-out infinite;
+        }
+
+        @keyframes dash-flow {
+          from {
+            stroke-dashoffset: 0;
+          }
+          to {
+            stroke-dashoffset: 15;
+          }
+        }
+
+        @keyframes pulse-animation {
+          0%, 100% {
+            opacity: 1;
+            stroke-width: 1;
+          }
+          50% {
+            opacity: 0.6;
+            stroke-width: 2;
+          }
+        }
+
+        @keyframes glow-animation {
+          0%, 100% {
+            filter: drop-shadow(0 0 2px currentColor);
+          }
+          50% {
+            filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 0 10px currentColor);
+          }
+        }
+      `}</style>
     </div>
   );
 }
