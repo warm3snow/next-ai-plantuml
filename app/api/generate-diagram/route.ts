@@ -1,5 +1,6 @@
-import { OpenAI } from 'openai';
+import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
+import { createAIModel, getProviderConfigFromEnv } from '@/lib/ai-providers';
 
 const PLANTUML_SYSTEM_PROMPT = `You are an expert in creating PlantUML diagrams. Generate valid PlantUML code based on the user's natural language description. 
 
@@ -24,31 +25,22 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
-    }
+    // Get provider configuration from environment
+    const providerConfig = getProviderConfigFromEnv();
+    const model = createAIModel(providerConfig);
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const { text } = await generateText({
+      model: model as any,
       messages: [
         { role: 'system', content: PLANTUML_SYSTEM_PROMPT },
         { role: 'user', content: prompt }
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      maxTokens: 2000,
     });
 
-    const plantUMLCode = response.choices[0]?.message?.content?.trim() || '';
-
     // Clean up the response - remove markdown code blocks if present
-    let cleanedCode = plantUMLCode;
+    let cleanedCode = text.trim();
     if (cleanedCode.startsWith('```plantuml')) {
       cleanedCode = cleanedCode.replace(/```plantuml\n?/, '').replace(/```$/, '').trim();
     } else if (cleanedCode.startsWith('```')) {
@@ -59,7 +51,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Error generating diagram:', error);
     return NextResponse.json(
-      { error: 'Failed to generate diagram' },
+      { error: error instanceof Error ? error.message : 'Failed to generate diagram' },
       { status: 500 }
     );
   }
