@@ -238,7 +238,7 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
                 transformOrigin: 'center',
               }}
               dangerouslySetInnerHTML={{ __html: svgContent }}
-            />
+            ></div>
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
