@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DiagramPreview from './DiagramPreview';
+import ChatInterface from './ChatInterface';
+import DiagramHistory from './DiagramHistory';
 
 const DEFAULT_PLANTUML = `@startuml
 !theme plain
@@ -24,17 +26,41 @@ end note
 
 @enduml`;
 
+interface DiagramVersion {
+  id: string;
+  code: string;
+  timestamp: number;
+  label: string;
+}
+
 export default function DiagramEditor() {
   const [prompt, setPrompt] = useState('');
   const [plantUMLCode, setPlantUMLCode] = useState(DEFAULT_PLANTUML);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
+  const [history, setHistory] = useState<DiagramVersion[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+
+  // Save to history before AI modifications
+  const saveToHistory = (label: string) => {
+    const newVersion: DiagramVersion = {
+      id: `${Date.now()}-${Math.random()}`,
+      code: plantUMLCode,
+      timestamp: Date.now(),
+      label: label,
+    };
+    setHistory(prev => [newVersion, ...prev]);
+  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       setError('Please enter a description');
       return;
     }
+
+    // Save current state to history
+    saveToHistory('Before AI Generation');
 
     setIsGenerating(true);
     setError('');
@@ -68,8 +94,64 @@ export default function DiagramEditor() {
     }
   };
 
+  const handleDiagramUpdate = (newCode: string) => {
+    // Save current state before chat update
+    saveToHistory('Before Chat Update');
+    setPlantUMLCode(newCode);
+  };
+
+  const handleRestoreVersion = (code: string) => {
+    setPlantUMLCode(code);
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-6">
+      {/* Toggle Buttons for History and Chat */}
+      <div className="flex justify-center space-x-4">
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+            showHistory
+              ? 'bg-blue-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+          }`}
+        >
+          📜 {showHistory ? 'Hide' : 'Show'} History ({history.length})
+        </button>
+        <button
+          onClick={() => setShowChat(!showChat)}
+          className={`px-6 py-2 rounded-lg font-semibold transition-colors ${
+            showChat
+              ? 'bg-blue-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+          }`}
+        >
+          💬 {showChat ? 'Hide' : 'Show'} AI Chat
+        </button>
+      </div>
+
+      {/* History Panel */}
+      {showHistory && (
+        <DiagramHistory
+          history={history}
+          onRestore={handleRestoreVersion}
+          onClear={handleClearHistory}
+        />
+      )}
+
+      {/* Chat Panel */}
+      {showChat && (
+        <ChatInterface
+          currentDiagram={plantUMLCode}
+          onDiagramUpdate={handleDiagramUpdate}
+        />
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Left Panel - Input */}
       <div className="space-y-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -160,6 +242,7 @@ export default function DiagramEditor() {
       <div className="lg:sticky lg:top-8 h-fit">
         <DiagramPreview plantUMLCode={plantUMLCode} />
       </div>
+    </div>
     </div>
   );
 }
