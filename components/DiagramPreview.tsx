@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import plantumlEncoder from 'plantuml-encoder';
 
 interface DiagramPreviewProps {
@@ -13,7 +13,6 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (plantUMLCode) {
@@ -136,7 +135,6 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
       </div>
 
       <div
-        ref={containerRef}
         className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-gray-200 dark:border-gray-700"
         style={{ height: '600px', cursor: isDragging ? 'grabbing' : 'grab' }}
         onMouseDown={handleMouseDown}

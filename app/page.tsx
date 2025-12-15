@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import DiagramEditor from '@/components/DiagramEditor';
 
 export default function Home() {
