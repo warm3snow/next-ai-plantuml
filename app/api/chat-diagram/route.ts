@@ -1,5 +1,6 @@
-import { OpenAI } from 'openai';
+import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
+import { createAIModel, getProviderConfigFromEnv } from '@/lib/ai-providers';
 
 const PLANTUML_CHAT_SYSTEM_PROMPT = `You are an expert in creating and modifying PlantUML diagrams. You help users refine their diagrams through conversational interactions.
 
@@ -29,26 +30,19 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    // Get provider configuration from environment
+    const providerConfig = getProviderConfigFromEnv();
+    const model = createAIModel(providerConfig);
 
     // Prepare messages with context
-    const contextualMessages = [
-      { role: 'system' as const, content: PLANTUML_CHAT_SYSTEM_PROMPT },
+    const contextualMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+      { role: 'system', content: PLANTUML_CHAT_SYSTEM_PROMPT },
     ];
 
     // Add current diagram context if available
     if (currentDiagram) {
       contextualMessages.push({
-        role: 'system' as const,
+        role: 'system',
         content: `Current diagram code:\n${currentDiagram}`,
       });
     }
@@ -56,14 +50,14 @@ export async function POST(req: Request) {
     // Add conversation history
     contextualMessages.push(...messages);
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+    const { text } = await generateText({
+      model: model as any,
       messages: contextualMessages,
       temperature: 0.7,
-      max_tokens: 2000,
+      maxTokens: 2000,
     });
 
-    const assistantMessage = response.choices[0]?.message?.content?.trim() || '';
+    const assistantMessage = text.trim();
 
     // Check if the response contains PlantUML code
     let plantUMLCode = null;
@@ -101,7 +95,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Error in chat:', error);
     return NextResponse.json(
-      { error: 'Failed to process chat message' },
+      { error: error instanceof Error ? error.message : 'Failed to process chat message' },
       { status: 500 }
     );
   }
