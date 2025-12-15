@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import plantumlEncoder from 'plantuml-encoder';
 
 interface DiagramPreviewProps {
@@ -8,24 +8,69 @@ interface DiagramPreviewProps {
 }
 
 export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
-  const [imageUrl, setImageUrl] = useState('');
+  const [svgContent, setSvgContent] = useState('');
   const [zoom, setZoom] = useState(100);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [animationsEnabled, setAnimationsEnabled] = useState(true);
+  const [animationType, setAnimationType] = useState<'flow' | 'pulse' | 'glow'>('flow');
+  const svgContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (plantUMLCode) {
-      try {
-        const encoded = plantumlEncoder.encode(plantUMLCode);
-        // Using PlantUML server
-        const url = `https://www.plantuml.com/plantuml/svg/${encoded}`;
-        setImageUrl(url);
-      } catch (error) {
-        console.error('Error encoding PlantUML:', error);
-      }
+      const fetchSvg = async () => {
+        try {
+          const encoded = plantumlEncoder.encode(plantUMLCode);
+          // Using PlantUML server
+          const url = `https://www.plantuml.com/plantuml/svg/${encoded}`;
+          const response = await fetch(url);
+          const svgText = await response.text();
+          setSvgContent(svgText);
+        } catch (error) {
+          console.error('Error fetching PlantUML SVG:', error);
+        }
+      };
+      fetchSvg();
     }
   }, [plantUMLCode]);
+
+  // Apply animations to SVG connectors
+  useEffect(() => {
+    if (svgContainerRef.current && svgContent && animationsEnabled) {
+      const svgElement = svgContainerRef.current.querySelector('svg');
+      if (!svgElement) return;
+
+      // Find all connector elements (paths, lines, polygons that represent arrows)
+      const connectors = svgElement.querySelectorAll('path[d*="M"], line, polyline, polygon');
+      
+      connectors.forEach((connector) => {
+        const element = connector as SVGElement;
+        
+        // Remove existing animation classes
+        element.classList.remove('connector-flow', 'connector-pulse', 'connector-glow');
+        
+        // Add animation class based on type
+        if (animationType === 'flow') {
+          element.classList.add('connector-flow');
+        } else if (animationType === 'pulse') {
+          element.classList.add('connector-pulse');
+        } else if (animationType === 'glow') {
+          element.classList.add('connector-glow');
+        }
+      });
+    } else if (svgContainerRef.current && !animationsEnabled) {
+      // Remove all animations when disabled
+      const svgElement = svgContainerRef.current.querySelector('svg');
+      if (svgElement) {
+        const connectors = svgElement.querySelectorAll('path[d*="M"], line, polyline, polygon');
+        connectors.forEach((connector) => {
+          const element = connector as SVGElement;
+          element.classList.remove('connector-flow', 'connector-pulse', 'connector-glow');
+        });
+      }
+    }
+  }, [svgContent, animationsEnabled, animationType]);
 
   const handleZoomIn = () => {
     setZoom((prev) => Math.min(prev + 10, 200));
