@@ -54,7 +54,7 @@ export default function DiagramEditor() {
     return () => {
       resizeObserver.disconnect();
     };
-  }, [plantUMLCode]);
+  }, []); // Empty dependency array - observer handles all updates
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
