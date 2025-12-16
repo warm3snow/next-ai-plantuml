@@ -47,6 +47,10 @@ npm run dev
 
 ## Provider Setup
 
+The application now supports a simplified configuration format. You can use either:
+- **New format** (recommended): `PROVIDER` and `API_KEY`
+- **Legacy format** (still supported): Provider-specific variables like `AI_PROVIDER` and `OPENAI_API_KEY`
+
 ### Ollama (Local AI - Default)
 
 No API key needed! Just install and run Ollama locally:
@@ -60,8 +64,8 @@ No API key needed! Just install and run Ollama locally:
 Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys):
 
 ```env
-AI_PROVIDER=openai
-OPENAI_API_KEY=your_openai_api_key_here
+PROVIDER=openai
+API_KEY=your_api_key_here
 ```
 
 ### Anthropic Claude
@@ -69,8 +73,8 @@ OPENAI_API_KEY=your_openai_api_key_here
 Get your API key from [Anthropic Console](https://console.anthropic.com/):
 
 ```env
-AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+PROVIDER=anthropic
+API_KEY=your_api_key_here
 ```
 
 ### Google AI (Gemini)
@@ -78,8 +82,8 @@ ANTHROPIC_API_KEY=your_anthropic_api_key_here
 Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey):
 
 ```env
-AI_PROVIDER=google
-GOOGLE_AI_API_KEY=your_google_ai_api_key_here
+PROVIDER=google
+API_KEY=your_api_key_here
 ```
 
 ### AWS Bedrock
@@ -87,10 +91,10 @@ GOOGLE_AI_API_KEY=your_google_ai_api_key_here
 Configure your AWS credentials:
 
 ```env
-AI_PROVIDER=bedrock
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your_access_key_id
-AWS_SECRET_ACCESS_KEY=your_secret_access_key
+PROVIDER=bedrock
+REGION=us-east-1
+ACCESS_KEY_ID=your_access_key_id
+SECRET_ACCESS_KEY=your_secret_access_key
 ```
 
 ### Azure OpenAI
@@ -98,10 +102,10 @@ AWS_SECRET_ACCESS_KEY=your_secret_access_key
 Get your credentials from Azure Portal:
 
 ```env
-AI_PROVIDER=azure
-AZURE_OPENAI_API_KEY=your_azure_api_key
-AZURE_OPENAI_RESOURCE_NAME=your_resource_name
-AZURE_OPENAI_API_VERSION=2024-02-15-preview
+PROVIDER=azure
+API_KEY=your_api_key_here
+RESOURCE_NAME=your_resource_name
+API_VERSION=2024-02-15-preview
 ```
 
 ### OpenRouter
@@ -109,8 +113,8 @@ AZURE_OPENAI_API_VERSION=2024-02-15-preview
 Get your API key from [OpenRouter](https://openrouter.ai/keys):
 
 ```env
-AI_PROVIDER=openrouter
-OPENROUTER_API_KEY=your_openrouter_api_key
+PROVIDER=openrouter
+API_KEY=your_api_key_here
 ```
 
 ### DeepSeek
@@ -118,8 +122,8 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 Get your API key from [DeepSeek Platform](https://platform.deepseek.com/):
 
 ```env
-AI_PROVIDER=deepseek
-DEEPSEEK_API_KEY=your_deepseek_api_key
+PROVIDER=deepseek
+API_KEY=your_api_key_here
 ```
 
 ### SiliconFlow
@@ -127,9 +131,19 @@ DEEPSEEK_API_KEY=your_deepseek_api_key
 Get your API key from [SiliconFlow](https://siliconflow.cn/):
 
 ```env
-AI_PROVIDER=siliconflow
-SILICONFLOW_API_KEY=your_siliconflow_api_key
+PROVIDER=siliconflow
+API_KEY=your_api_key_here
 ```
+
+### Legacy Configuration
+
+The following legacy environment variables are still supported for backward compatibility:
+- `AI_PROVIDER` (use `PROVIDER` instead)
+- `AI_MODEL` (use `MODEL` instead)
+- `OLLAMA_BASE_URL` (use `BASE_URL` instead)
+- `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, etc. (use `API_KEY` instead)
+- `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (use `REGION`, `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY` instead)
+- `AZURE_OPENAI_API_KEY`, `AZURE_OPENAI_RESOURCE_NAME`, `AZURE_OPENAI_API_VERSION` (use `API_KEY`, `RESOURCE_NAME`, `API_VERSION` instead)
 
 ## Usage
 

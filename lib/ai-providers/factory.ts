@@ -109,53 +109,62 @@ export function createAIModel(config: AIProviderConfig) {
  * Gets the provider configuration from environment variables
  */
 export function getProviderConfigFromEnv(): AIProviderConfig {
-  const provider = (process.env.AI_PROVIDER || 'ollama') as AIProviderConfig['provider'];
+  // Support both new (PROVIDER) and legacy (AI_PROVIDER) variable names
+  const provider = (process.env.PROVIDER || process.env.AI_PROVIDER || 'ollama') as AIProviderConfig['provider'];
   
   const config: AIProviderConfig = {
     provider,
-    model: process.env.AI_MODEL,
+    // Support both new (MODEL) and legacy (AI_MODEL) variable names
+    model: process.env.MODEL || process.env.AI_MODEL,
   };
 
   // Add provider-specific configuration
   switch (provider) {
     case 'ollama':
-      config.baseURL = process.env.OLLAMA_BASE_URL;
+      config.baseURL = process.env.BASE_URL || process.env.OLLAMA_BASE_URL;
       break;
 
     case 'openai':
-      config.apiKey = process.env.OPENAI_API_KEY;
+      // Support both new (API_KEY) and legacy (OPENAI_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.OPENAI_API_KEY;
       break;
 
     case 'anthropic':
-      config.apiKey = process.env.ANTHROPIC_API_KEY;
+      // Support both new (API_KEY) and legacy (ANTHROPIC_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.ANTHROPIC_API_KEY;
       break;
 
     case 'google':
-      config.apiKey = process.env.GOOGLE_AI_API_KEY;
+      // Support both new (API_KEY) and legacy (GOOGLE_AI_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.GOOGLE_AI_API_KEY;
       break;
 
     case 'bedrock':
-      config.region = process.env.AWS_REGION;
-      config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
-      config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+      config.region = process.env.REGION || process.env.AWS_REGION;
+      config.accessKeyId = process.env.ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
+      config.secretAccessKey = process.env.SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
       break;
 
     case 'azure':
-      config.apiKey = process.env.AZURE_OPENAI_API_KEY;
-      config.resourceName = process.env.AZURE_OPENAI_RESOURCE_NAME;
-      config.apiVersion = process.env.AZURE_OPENAI_API_VERSION;
+      // Support both new (API_KEY) and legacy (AZURE_OPENAI_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.AZURE_OPENAI_API_KEY;
+      config.resourceName = process.env.RESOURCE_NAME || process.env.AZURE_OPENAI_RESOURCE_NAME;
+      config.apiVersion = process.env.API_VERSION || process.env.AZURE_OPENAI_API_VERSION;
       break;
 
     case 'openrouter':
-      config.apiKey = process.env.OPENROUTER_API_KEY;
+      // Support both new (API_KEY) and legacy (OPENROUTER_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.OPENROUTER_API_KEY;
       break;
 
     case 'deepseek':
-      config.apiKey = process.env.DEEPSEEK_API_KEY;
+      // Support both new (API_KEY) and legacy (DEEPSEEK_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.DEEPSEEK_API_KEY;
       break;
 
     case 'siliconflow':
-      config.apiKey = process.env.SILICONFLOW_API_KEY;
+      // Support both new (API_KEY) and legacy (SILICONFLOW_API_KEY) variable names
+      config.apiKey = process.env.API_KEY || process.env.SILICONFLOW_API_KEY;
       break;
   }
 
