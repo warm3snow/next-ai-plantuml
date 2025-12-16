@@ -89,7 +89,7 @@ export default function ChatInterface({ currentDiagram, onDiagramUpdate }: ChatI
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col h-full">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col min-h-[600px]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
           💬 AI Chat
@@ -105,7 +105,7 @@ export default function ChatInterface({ currentDiagram, onDiagramUpdate }: ChatI
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-[300px] max-h-[400px]">
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 text-sm">
             <div className="text-center">
