@@ -15,9 +15,10 @@ export function createAIModel(config: AIProviderConfig) {
     case 'ollama': {
       // Use OpenAI compatibility mode for Ollama
       // Ollama exposes OpenAI-compatible API at /v1 endpoint
+      // The AI SDK automatically appends /v1 to the baseURL, so we don't add it here
       const baseURL = config.baseURL || DEFAULT_BASE_URLS.ollama;
       const ollama = createOpenAI({
-        baseURL: `${baseURL}/v1`,
+        baseURL: baseURL,
         apiKey: 'ollama', // Ollama doesn't require a real API key, but the client needs one
       });
       return ollama(model);
