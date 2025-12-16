@@ -20,7 +20,9 @@ export function createAIModel(config: AIProviderConfig) {
         baseURL: `${baseURL}/v1`,
         apiKey: 'ollama', // Ollama doesn't require a real API key, but the client needs one
       });
-      return ollama(model);
+      // Use .chat to ensure we call /chat/completions instead of /responses
+      // Ollama's OpenAI-compatible API only supports chat completions
+      return ollama.chat(model);
     }
 
     case 'openai': {
@@ -28,7 +30,8 @@ export function createAIModel(config: AIProviderConfig) {
         throw new Error('OpenAI API key is required');
       }
       const openai = createOpenAI({ apiKey: config.apiKey });
-      return openai(model);
+      // Use .chat to explicitly use the chat completions API
+      return openai.chat(model);
     }
 
     case 'anthropic': {
@@ -79,7 +82,8 @@ export function createAIModel(config: AIProviderConfig) {
         apiKey: config.apiKey,
         baseURL: DEFAULT_BASE_URLS.openrouter,
       });
-      return openrouter(model);
+      // Use .chat for OpenAI-compatible APIs that only support chat completions
+      return openrouter.chat(model);
     }
 
     case 'deepseek': {
@@ -90,7 +94,8 @@ export function createAIModel(config: AIProviderConfig) {
         apiKey: config.apiKey,
         baseURL: DEFAULT_BASE_URLS.deepseek,
       });
-      return deepseek(model);
+      // Use .chat for OpenAI-compatible APIs that only support chat completions
+      return deepseek.chat(model);
     }
 
     case 'siliconflow': {
@@ -101,7 +106,8 @@ export function createAIModel(config: AIProviderConfig) {
         apiKey: config.apiKey,
         baseURL: DEFAULT_BASE_URLS.siliconflow,
       });
-      return siliconflow(model);
+      // Use .chat for OpenAI-compatible APIs that only support chat completions
+      return siliconflow.chat(model);
     }
 
     default:
