@@ -34,17 +34,17 @@ export default function DiagramEditor() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Left Panel - AI Chat */}
+      {/* Left Panel - Diagram Preview */}
+      <div className="lg:sticky lg:top-8 h-fit">
+        <DiagramPreview plantUMLCode={plantUMLCode} />
+      </div>
+
+      {/* Right Panel - AI Chat */}
       <div className="lg:sticky lg:top-8 h-fit">
         <ChatInterface
           currentDiagram={plantUMLCode}
           onDiagramUpdate={handleDiagramUpdate}
         />
-      </div>
-
-      {/* Right Panel - Diagram Preview */}
-      <div className="lg:sticky lg:top-8 h-fit">
-        <DiagramPreview plantUMLCode={plantUMLCode} />
       </div>
     </div>
   );
