@@ -3,7 +3,6 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 import { createAzure } from '@ai-sdk/azure';
-import { createOllama } from 'ollama-ai-provider';
 import { AIProviderConfig, DEFAULT_MODELS, DEFAULT_BASE_URLS } from './types';
 
 /**
@@ -14,8 +13,13 @@ export function createAIModel(config: AIProviderConfig) {
 
   switch (config.provider) {
     case 'ollama': {
+      // Use OpenAI compatibility mode for Ollama
+      // Ollama exposes OpenAI-compatible API at /v1 endpoint
       const baseURL = config.baseURL || DEFAULT_BASE_URLS.ollama;
-      const ollama = createOllama({ baseURL });
+      const ollama = createOpenAI({
+        baseURL: `${baseURL}/v1`,
+        apiKey: 'ollama', // Ollama doesn't require a real API key, but the client needs one
+      });
       return ollama(model);
     }
 
