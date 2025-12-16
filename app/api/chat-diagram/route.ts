@@ -1,6 +1,7 @@
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 import { createAIModel, getProviderConfigFromEnv } from '@/lib/ai-providers';
+import { removeThinkTags } from '@/lib/llm-utils';
 
 const PLANTUML_CHAT_SYSTEM_PROMPT = `You are an expert in creating and modifying PlantUML diagrams. You help users refine their diagrams through conversational interactions.
 
@@ -58,12 +59,8 @@ export async function POST(req: Request) {
       maxOutputTokens: 2000,
     });
 
-    let assistantMessage = text.trim();
-
     // Remove <think></think> tags for DeepSeek models
-    if (assistantMessage.includes('<think>') && assistantMessage.includes('</think>')) {
-      assistantMessage = assistantMessage.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-    }
+    let assistantMessage = removeThinkTags(text.trim());
 
     // Check if the response contains PlantUML code
     let plantUMLCode = null;

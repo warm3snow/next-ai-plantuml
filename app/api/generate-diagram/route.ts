@@ -1,6 +1,7 @@
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
 import { createAIModel, getProviderConfigFromEnv } from '@/lib/ai-providers';
+import { removeThinkTags, removeMarkdownCodeBlocks } from '@/lib/llm-utils';
 
 const PLANTUML_SYSTEM_PROMPT = `You are an expert in creating PlantUML diagrams. Generate valid PlantUML code based on the user's natural language description. 
 
@@ -39,19 +40,9 @@ export async function POST(req: Request) {
       maxOutputTokens: 2000,
     });
 
-    let cleanedCode = text.trim();
-
-    // Remove <think></think> tags for DeepSeek models
-    if (cleanedCode.includes('<think>') && cleanedCode.includes('</think>')) {
-      cleanedCode = cleanedCode.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-    }
-
-    // Clean up the response - remove markdown code blocks if present
-    if (cleanedCode.startsWith('```plantuml')) {
-      cleanedCode = cleanedCode.replace(/```plantuml\n?/, '').replace(/```$/, '').trim();
-    } else if (cleanedCode.startsWith('```')) {
-      cleanedCode = cleanedCode.replace(/```\n?/, '').replace(/```$/, '').trim();
-    }
+    // Remove <think></think> tags for DeepSeek models and clean markdown
+    let cleanedCode = removeThinkTags(text.trim());
+    cleanedCode = removeMarkdownCodeBlocks(cleanedCode);
 
     return NextResponse.json({ plantUMLCode: cleanedCode });
   } catch (error) {
