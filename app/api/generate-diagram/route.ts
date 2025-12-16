@@ -39,8 +39,14 @@ export async function POST(req: Request) {
       maxOutputTokens: 2000,
     });
 
-    // Clean up the response - remove markdown code blocks if present
     let cleanedCode = text.trim();
+
+    // Remove <think></think> tags for DeepSeek models
+    if (cleanedCode.includes('<think>') && cleanedCode.includes('</think>')) {
+      cleanedCode = cleanedCode.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+    }
+
+    // Clean up the response - remove markdown code blocks if present
     if (cleanedCode.startsWith('```plantuml')) {
       cleanedCode = cleanedCode.replace(/```plantuml\n?/, '').replace(/```$/, '').trim();
     } else if (cleanedCode.startsWith('```')) {

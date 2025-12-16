@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const providerConfig = getProviderConfigFromEnv();
     const model = createAIModel(providerConfig);
 
-    // Prepare messages with context
+    // Prepare messages with context - only use last 2 messages from conversation
     const contextualMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
       { role: 'system', content: PLANTUML_CHAT_SYSTEM_PROMPT },
     ];
@@ -47,8 +47,9 @@ export async function POST(req: Request) {
       });
     }
 
-    // Add conversation history
-    contextualMessages.push(...messages);
+    // Add only the last 2 messages from conversation history
+    const recentMessages = messages.slice(-2);
+    contextualMessages.push(...recentMessages);
 
     const { text } = await generateText({
       model: model as any,
@@ -57,7 +58,12 @@ export async function POST(req: Request) {
       maxOutputTokens: 2000,
     });
 
-    const assistantMessage = text.trim();
+    let assistantMessage = text.trim();
+
+    // Remove <think></think> tags for DeepSeek models
+    if (assistantMessage.includes('<think>') && assistantMessage.includes('</think>')) {
+      assistantMessage = assistantMessage.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+    }
 
     // Check if the response contains PlantUML code
     let plantUMLCode = null;
