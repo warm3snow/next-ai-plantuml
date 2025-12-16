@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       model: model as any,
       messages: contextualMessages,
       temperature: 0.7,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     });
 
     const assistantMessage = text.trim();

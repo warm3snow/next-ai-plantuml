@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         { role: 'user', content: prompt }
       ],
       temperature: 0.7,
-      maxTokens: 2000,
+      maxOutputTokens: 2000,
     });
 
     // Clean up the response - remove markdown code blocks if present
