@@ -74,6 +74,17 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
     setZoom((prev) => Math.max(50, Math.min(200, prev + delta)));
   };
 
+  const handleDownload = () => {
+    if (!svgContent) return;
+    const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'diagram.svg';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <div className="flex items-center justify-between mb-4">
@@ -81,6 +92,14 @@ export default function DiagramPreview({ plantUMLCode }: DiagramPreviewProps) {
           Diagram Preview
         </h2>
         <div className="flex items-center space-x-2">
+          <button
+            onClick={handleDownload}
+            disabled={!svgContent}
+            className="px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
+            title="Download diagram as SVG"
+          >
+            Download
+          </button>
           <button
             onClick={handleZoomOut}
             className="p-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"

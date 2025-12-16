@@ -16,9 +16,6 @@
 
 ![Next AI PlantUML UI](docs/next-ai-plantuml-demo.png)
 
-
-> 如果觉得这个项目对你有帮助，请点个 ⭐ Star —— 您的 Star 是我持续更新的动力！
-
 ## 快速开始
 
 ### 依赖
@@ -74,6 +71,9 @@ BASE_URL=http://localhost:11434
 
 MIT License · 版权 (c) warm3snow
 
-## Star 曲线
+## Star 趋势
 
 ![Star History Chart](https://api.star-history.com/svg?repos=warm3snow/next-ai-plantuml&type=Date)
+
+> 如果觉得这个项目对你有帮助，请点个 ⭐ Star —— 您的 Star 是我持续更新的动力！
+

@@ -16,10 +16,6 @@ A Next.js-based UML Diagram Generator that leverages AI to create PlantUML diagr
 
 ![Next AI PlantUML UI](docs/next-ai-plantuml-demo.png)
 
-> Place the provided screenshot at docs/next-ai-plantuml-demo.png if it does not render above.
-
-> If you find this project helpful, please consider giving it a ⭐ star — your support motivates continuous updates!
-
 ## Getting Started
 
 ### Prerequisites
@@ -111,3 +107,5 @@ MIT License · Copyright (c) warm3snow
 ## Star History
 
 ![Star History Chart](https://api.star-history.com/svg?repos=warm3snow/next-ai-plantuml&type=Date)
+
+> If you find this project helpful, please consider giving it a ⭐ star — your support motivates continuous updates!
