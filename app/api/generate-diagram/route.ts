@@ -1,6 +1,6 @@
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
-import { createAIModel, getProviderConfigFromEnv } from '@/lib/ai-providers';
+import { createAIModel, getProviderConfigFromEnv, DEFAULT_MODELS } from '@/lib/ai-providers';
 import { removeThinkTags, removeMarkdownCodeBlocks } from '@/lib/llm-utils';
 
 const PLANTUML_SYSTEM_PROMPT = `You are an expert in creating PlantUML diagrams. Generate valid PlantUML code based on the user's natural language description. 
@@ -28,12 +28,20 @@ export async function POST(req: Request) {
 
     // Get provider configuration from environment
     const providerConfig = getProviderConfigFromEnv();
+    const modelName = providerConfig.model || DEFAULT_MODELS[providerConfig.provider];
+    const isOpenAICompatProvider = ['openai', 'azure', 'ollama', 'openrouter', 'deepseek', 'siliconflow'].includes(
+      providerConfig.provider
+    );
+    const modelTriggersDeveloperRole =
+      isOpenAICompatProvider &&
+      !(modelName.startsWith('gpt-3') || modelName.startsWith('gpt-4') || modelName.startsWith('chatgpt-4o') || modelName.startsWith('gpt-5-chat'));
+    const systemRole: 'system' | 'user' = modelTriggersDeveloperRole ? 'user' : 'system';
     const model = createAIModel(providerConfig);
 
     const { text } = await generateText({
       model: model as any,
       messages: [
-        { role: 'system', content: PLANTUML_SYSTEM_PROMPT },
+        { role: systemRole, content: PLANTUML_SYSTEM_PROMPT },
         { role: 'user', content: prompt }
       ],
       temperature: 0.7,

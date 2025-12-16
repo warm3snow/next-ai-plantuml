@@ -1,6 +1,6 @@
 import { generateText } from 'ai';
 import { NextResponse } from 'next/server';
-import { createAIModel, getProviderConfigFromEnv } from '@/lib/ai-providers';
+import { createAIModel, getProviderConfigFromEnv, DEFAULT_MODELS } from '@/lib/ai-providers';
 import { removeThinkTags } from '@/lib/llm-utils';
 
 const PLANTUML_CHAT_SYSTEM_PROMPT = `You are an expert in creating and modifying PlantUML diagrams. You help users refine their diagrams through conversational interactions.
@@ -33,23 +33,40 @@ export async function POST(req: Request) {
 
     // Get provider configuration from environment
     const providerConfig = getProviderConfigFromEnv();
+    const modelName = providerConfig.model || DEFAULT_MODELS[providerConfig.provider];
+    const isOpenAICompatProvider = ['openai', 'azure', 'ollama', 'openrouter', 'deepseek', 'siliconflow'].includes(
+      providerConfig.provider
+    );
+    const modelTriggersDeveloperRole =
+      isOpenAICompatProvider &&
+      !(modelName.startsWith('gpt-3') || modelName.startsWith('gpt-4') || modelName.startsWith('chatgpt-4o') || modelName.startsWith('gpt-5-chat'));
+    const systemRole: 'system' | 'user' = modelTriggersDeveloperRole ? 'user' : 'system';
     const model = createAIModel(providerConfig);
 
     // Prepare messages with context - only use last 2 messages from conversation
     const contextualMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
-      { role: 'system', content: PLANTUML_CHAT_SYSTEM_PROMPT },
+      { role: systemRole, content: PLANTUML_CHAT_SYSTEM_PROMPT },
     ];
 
     // Add current diagram context if available
     if (currentDiagram) {
       contextualMessages.push({
-        role: 'system',
+        role: systemRole,
         content: `Current diagram code:\n${currentDiagram}`,
       });
     }
 
     // Add only the last 2 messages from conversation history
-    const recentMessages = messages.slice(-2);
+    const recentMessages = messages.slice(-2).map((message: { role: string; content: string }) => {
+      if (message.role === 'assistant' || message.role === 'user') {
+        return message;
+      }
+
+      return {
+        role: systemRole,
+        content: message.content,
+      };
+    });
     contextualMessages.push(...recentMessages);
 
     const { text } = await generateText({
