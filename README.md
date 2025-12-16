@@ -59,6 +59,8 @@ No API key needed! Just install and run Ollama locally:
 2. Pull a model: `ollama pull llama3.2`
 3. That's it! The app will use `http://localhost:11434` by default
 
+**Note:** Requires Ollama with OpenAI API compatibility (available in versions from Feb 2024 onwards).
+
 ### OpenAI
 
 Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys):
