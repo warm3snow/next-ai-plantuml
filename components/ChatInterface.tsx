@@ -10,9 +10,10 @@ interface Message {
 interface ChatInterfaceProps {
   currentDiagram: string;
   onDiagramUpdate: (newCode: string) => void;
+  targetHeight?: number | null;
 }
 
-export default function ChatInterface({ currentDiagram, onDiagramUpdate }: ChatInterfaceProps) {
+export default function ChatInterface({ currentDiagram, onDiagramUpdate, targetHeight }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -89,7 +90,10 @@ export default function ChatInterface({ currentDiagram, onDiagramUpdate }: ChatI
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col min-h-[600px]">
+    <div 
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col"
+      style={targetHeight ? { height: `${targetHeight}px` } : { minHeight: '600px' }}
+    >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
           💬 AI Chat
